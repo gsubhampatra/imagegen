@@ -20,9 +20,12 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="container m-10" >
-      <div>
-        <h1 className="my-5 text-xl font-bold">Community Posts</h1>
+    <div className="container p-2" >
+        <div className={"flex justify-between my-2 items-center"}>
+          <h1 className="text-xl font-bold">Community Posts</h1>
+          <a href={"/login"} className="bg-orange-600 text-white rounded p-2">Create your post</a>
+        </div>
+
         {loading ? (
           <div className="flex items-center justify-center m-10">
             <img
@@ -32,11 +35,10 @@ const Home = () => {
             />
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2" >{
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 p-2" >{
             allPost && allPost.map((post) => <DisplayPost key={post.id} post={post} />)
           }</div>
         )}
-      </div>
     </div>
   );
 };
