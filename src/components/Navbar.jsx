@@ -27,7 +27,10 @@ const Navbar = () => {
             <div className="link">
               <div className="d-flex">
                 {user.displayName}{" "}
-                <img className="logo" src={user.photoURL} alt="" />
+                <img className="logo" src={user.photoURL} alt="" onError={(event)=>{
+                  event.target.src = "https://cdn.jsdelivr.net/gh/alohe/memojis/png/toon_8.png"
+                }
+                }   />
                 <button onClick={logOut}>
                   <LogoutIcon />
                 </button>
