@@ -12,7 +12,7 @@ This repository contains the source code for a Text-to-Image Generation web appl
 
 ## Live Demo
 
-You can check out the live demo of the web application at [https://www.example.com/demo](https://imagegen.gsubham.tech)
+You can check out the live demo of the web application at [ImageGen by gsubhampatra](https://imagegen.gsubham.tech)
 
 ## Getting Started
 
