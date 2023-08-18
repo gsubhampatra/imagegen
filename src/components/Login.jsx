@@ -7,7 +7,7 @@ const Login = () => {
   const navigator = useNavigate()
   const signIn = () =>{
    signInWithPopup(Auth,Provider)
-    .then(res=>console.log("signin Successfully"), navigator("/"))
+    .then(res=>console.log("signin Successfully"), navigator("/generate"))
     .catch(err=>console.log(err))
   }
 
