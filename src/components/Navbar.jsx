@@ -28,13 +28,13 @@ const Navbar = () => {
               <div className="d-flex">
                 {user.displayName}{" "}
                 <img className="logo" src={user.photoURL} alt="" />
-                <button onClick={logOut}>
+                <button className="p-2" onClick={logOut}>
                   <LogoutIcon />
                 </button>
               </div>
             </div>
           ) : (
-            <Link className="link" to="/login">
+            <Link className="link p-2 m-1" to="/login">
               Login
             </Link>
           )}
