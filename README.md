@@ -1,4 +1,4 @@
-# Text-to-Image Generation Web Application
+# Imagen Text-to-Image Generation Web Application
 
 
 This repository contains the source code for a Text-to-Image Generation web application developed using React and designed using Tailwind CSS. The application leverages the Hugging Face Inference API for Text-to-Image Generation models to convert text input into corresponding images.
@@ -12,7 +12,7 @@ This repository contains the source code for a Text-to-Image Generation web appl
 
 ## Live Demo
 
-You can check out the live demo of the web application at [ImageGen by gsubhampatra](https://imagegen.gsubham.tech)
+You can check out the live demo of the web application at [ImageGen by gsubhampatra](https://imagen-byg.vercel.app)
 
 ## Getting Started
 
@@ -21,8 +21,8 @@ To run the application locally, follow these steps:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/text-to-image-app.git
-cd text-to-image-app
+git clone https://github.com/gsubhampatra/imagen.ai.git
+cd imagen.ai
 ```
 
 2. Install dependencies:
@@ -78,4 +78,4 @@ We would like to express our gratitude to the contributors of the Hugging Face m
 
 ---
 
-Feel free to reach out to us or open an issue if you encounter any problems or have suggestions for improvement. Happy Text-to-Image Generation!
+Feel free to reach out to us or open an issue if you encounter any problems or have suggestions for improvement. Happy Imagen Generation!

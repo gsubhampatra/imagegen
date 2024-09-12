@@ -1,122 +1,130 @@
-import React, { useState } from "react";
-import { CircularIndeterminate } from "../loadingAnimation";
-import DownloadIcon from "@mui/icons-material/Download";
-import ShareIcon from "@mui/icons-material/Share";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { Auth, db, storage } from "../firebase-config";
-import { collection, addDoc } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { v4 } from "uuid";
+import React, { useState } from 'react'
 
-const API_TOKEN = "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";
+async function query(data) {
+  const token = process.env.REACT_APP_HUGGINGFACE_API_TOKEN
 
-const Generator = () => {
-  const [loading, setLoading] = useState(false);
-  const [output, setOutput] = useState(null);
-  const [prompt, setPrompt] = useState(null);
-  const [dImage, setDImage] = useState(null);
-
-  const [user] = useAuthState(Auth);
-  const postRef = collection(db, "post");
-
-  const uploadImage = async () => {
-    if (prompt != null && dImage != null) {
-      const imageRef = ref(storage, `images/${dImage.name + v4()}`);
-      uploadBytes(imageRef, dImage)
-        .then(() => {
-          getDownloadURL(imageRef).then((url) => {
-            addDoc(postRef, {
-              prompt: prompt,
-              image: url,
-              logo: user.photoURL,
-              user: user.displayName,
-            });
-            alert("posted")
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+  const response = await fetch(
+    "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify(data),
     }
-  };
+  )
+  const result = await response.blob()
+  console.log(result);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
+  return result
+}
 
-    const response = await fetch(
-      "https://api-inference.huggingface.co/models/prompthero/openjourney",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${API_TOKEN}`,
-        },
-        body: JSON.stringify({ inputs: prompt }),
-      }
-    );
+export default function Generator() {
+  const [prompt, setPrompt] = useState('')
+  const [image, setImage] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [style, setStyle] = useState('')
 
-    if (!response.ok) {
-      throw new Error("Failed to generate image");
+  const handleGenerate = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const fullPrompt = style ? `${prompt}, ${style} style` : prompt
+      const result = await query({ inputs: fullPrompt })
+      const imageUrl = URL.createObjectURL(result)
+      setImage(imageUrl)
+    } catch (err) {
+      setError('Failed to generate image. Please try again.')
+      console.error(err)
+    } finally {
+      setLoading(false)
     }
+  }
 
-    const blob = await response.blob();
-    setOutput(URL.createObjectURL(blob));
-    setDImage(new File([blob], "art.png", { type: "image/png" }));
-    setLoading(false);
-  };
-
-  const downloadImage = () => {
-    const link = document.createElement("a");
-    link.href = output;
-    link.download = "art.png";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  const handleDownload = () => {
+    if (image) {
+      const link = document.createElement('a')
+      link.href = image
+      link.download = 'generated-image.png'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+  }
 
   return (
-    <div className="container mt-3 imageGen al-c">
-      <h1>
-        Stable <span>Diffusion</span>
-      </h1>
-      <p>
-        Pellentesque vulputate dignissim enim, et sollicitudin massa
-        pellentesque ut. Proin luctus dui ut sem varius eleifend.
-      </p>
-      <form className="generate-form" onSubmit={handleSubmit}>
+    <>
+    <div className='flex items-center justify-center w-full m-2' >
+
+     <span className='relative  inline-block overflow-hidden rounded-full p-[1px]'>
+        <span className='absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]' />
+        <div className='inline-flex items-center justify-center w-full h-full px-3 py-1 text-lg font-medium rounded-full cursor-pointer bg-gray-950 text-gray-50 backdrop-blur-3xl'>
+          <a href="https://github.com/gsubhampatra/imagen.ai">Github</a>
+        </div>
+      </span>
+    </div>
+    <div className="max-w-md p-6 mx-auto mt-10 rounded-lg shadow-lg bg-violet-100">
+      
+      <div class="absolute inset-0 -z-10 h-full w-full bg-white [background:radial-gradient(125%_125%_at_50%_10%,#fff_40%,#63e_100%)]"></div>
+     
+
+
+      <h1 className="mb-4 text-2xl font-bold text-center ">AI Image Generator</h1>
+
+      <div className="space-y-4">
         <input
           type="text"
-          name="input"
-          placeholder="type your prompt here..."
+          placeholder="Enter your prompt here"
+          value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button type="submit">Generate</button>
-      </form>
-      <div>
+        <select
+          value={style}
+          onChange={(e) => setStyle(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Select a style (optional)</option>
+          <option value="cyberpunk">Cyberpunk</option>
+          <option value="artistic">Artistic</option>
+          <option value="realistic">Realistic</option>
+          <option value="cartoon">Cartoon</option>
+          <option value="fantasy">Fantasy</option>
+        </select>
+        <button
+          onClick={handleGenerate}
+          disabled={loading || !prompt}
+          className={`w-full px-4 py-2 text-white font-semibold rounded-md ${loading || !prompt
+            ? 'bg-gray-400 cursor-not-allowed'
+            : 'bg-blue-500 hover:bg-blue-600'
+            }`}
+        >
+          {loading ? 'Generating...' : 'Generate Image'}
+        </button>
+        {error && (
+          <p className="text-sm text-center text-red-500">{error}</p>
+        )}
         {loading && (
-          <div className="loading">
-           <img src="https://i.pinimg.com/originals/88/1e/97/881e975af06ff67857544c7b64e65cbc.gif" alt="loading" />
+          <div className="flex justify-center">
+            <img src="https://i.pinimg.com/originals/88/1e/97/881e975af06ff67857544c7b64e65cbc.gif" alt="Loading"
+              className="object-cover w-full h-64 rounded-md" />
           </div>
         )}
-        {!loading && output && (
-          <div className="result-image">
-            <img src={output} alt="art" />
-            <div className="action">
-              <button onClick={downloadImage}>
-                <DownloadIcon />{" "}
-              </button>
-              {user && (
-                <button onClick={uploadImage}>
-                  <ShareIcon />{" "}
-                </button>
-              )}
-            </div>
+        {image && (
+          <div className="mt-4">
+            <img src={image} alt="Generated" className="w-full h-auto rounded-lg" />
+            <button
+              onClick={handleDownload}
+              className="w-full px-4 py-2 mt-2 font-semibold text-white bg-green-500 rounded-md hover:bg-green-600"
+            >
+              Download Image
+            </button>
           </div>
         )}
       </div>
     </div>
-  );
-};
-
-export default Generator;
+    </>
+  )
+}
